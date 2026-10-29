@@ -1,6 +1,6 @@
 # 📁 File Management System
 
-A full-stack file management platform built with React, Node.js, Express, and MySQL, featuring secure JWT authentication, role-based access control, hierarchical folder organization, and OCR-powered document text extraction. Users can upload, organize, search, and manage PDF documents and images (JPG, PNG) through a modern, responsive interface with light/dark theme support, deployable as a portable desktop application using Google Chrome Portable v109.
+A full-stack file management platform built with React, Node.js, Express, and MySQL, designed specifically for managing **PDF documents and images (JPG, PNG)**. Features secure JWT authentication, role-based access control, hierarchical folder organization, and OCR-powered text extraction. Users can upload, organize, search, and manage their files through a modern, responsive interface with light/dark theme support.
 
 ---
 
@@ -8,14 +8,13 @@ A full-stack file management platform built with React, Node.js, Express, and My
 
 - **🔐 Secure Authentication** — JWT-based login/register with HTTP-only cookies and role-based access control (Admin & User roles)
 - **📂 Hierarchical Folder Management** — Create, rename, and organize folders in a nested directory structure with breadcrumb navigation
-- **📄 File Upload & Management** — Upload, preview, download, rename, and soft-delete **PDF documents and images (JPG, PNG)** with drag-and-drop support
+- **📄 File Upload & Management** — Upload, preview, download, rename, and soft-delete PDF documents and images (JPG, PNG) with drag-and-drop support
 - **🔍 Full-Text Search** — Search across file names and extracted document content for instant retrieval
-- **🧠 OCR Text Extraction** — Automatically extract text from uploaded PDFs and images (JPG, PNG) using Tesseract.js for searchable content
+- **🧠 OCR Text Extraction** — Automatically extract text from uploaded PDFs and images using Tesseract.js for searchable content
 - **👥 Admin User Management** — Admin dashboard to create, edit, and manage user accounts and roles
 - **🌗 Light & Dark Theme** — Toggle between light and dark mode with persistent preference storage
 - **📱 Responsive Design** — Fully responsive UI that works seamlessly across desktop, tablet, and mobile devices
 - **📊 Grid & List Views** — Switch between grid and list view modes for browsing files and folders
-- **🖥️ Portable Desktop App** — Deployable as a native-like desktop application using Google Chrome Portable v109 with a custom window size, runnable via a batch file shortcut — no browser installation required
 
 ---
 
@@ -39,11 +38,6 @@ A full-stack file management platform built with React, Node.js, Express, and My
 | **Multer** | File upload handling |
 | **Tesseract.js** | OCR text extraction |
 | **bcryptjs** | Password hashing |
-
-### Deployment
-| Technology | Purpose |
-|---|---|
-| **Google Chrome Portable v109** | Desktop app shell (Windows 7+ compatible) |
 
 ---
 
@@ -160,48 +154,6 @@ Open your browser and navigate to `http://localhost:5180`
 |---|---|---|
 | Admin | `admin` | `admin` |
 | Viewer | `viewer` | `viewer` |
-
----
-
-## 🖥️ Portable Desktop App Deployment
-
-This project can be deployed as a **native-like desktop application** using [Google Chrome Portable v109](https://sourceforge.net/projects/nicotine-plus-portable/) — the last version that supports **Windows 7**. The UI is designed with a custom window size optimized for the Chrome Portable app shell.
-
-### Folder Structure
-
-```
-FileManagementSystem/
-├── GoogleChromePortable/     # Chrome Portable v109 (from SourceForge)
-├── config.txt                # App URL configuration
-├── RunApp.bat                # Batch file to launch the app
-└── File Management System    # Desktop shortcut (.lnk)
-```
-
-### How It Works
-
-1. **`config.txt`** — Contains the target URL (e.g., `http://localhost:5180` or another IP address). Edit this file to point to any running instance of the system.
-2. **`RunApp.bat`** — Reads the URL from `config.txt` and launches Chrome Portable in app mode (`--app=URL`) with a custom window size, making it look and feel like a standalone desktop application.
-3. **Desktop Shortcut** — A `.lnk` shortcut that runs `RunApp.bat` for quick access.
-
-### Reusing for Other Projects
-
-- **Copy the entire folder** and change `config.txt` to point to a different URL/IP address to create another desktop app.
-- **Important:** Use **Google Chrome Portable v109 specifically** — other versions may not work with this setup. v109 is the final version supporting Windows 7.
-
-> **Note:** The frontend UI is sized and styled to fit the portable Chrome window dimensions, providing a polished desktop-app experience rather than a typical browser layout.
-
----
-
-## 📎 Supported File Types
-
-This system is designed to manage the following file types:
-
-| File Type | Extensions | OCR / Text Extraction |
-|---|---|---|
-| **PDF Documents** | `.pdf` | ✅ Text extracted via `pdf-parse` |
-| **Images** | `.jpg`, `.png` | ✅ Text extracted via Tesseract.js OCR |
-
-> **Note:** Other file types are not supported. The system is purpose-built for managing and searching through PDF documents and images.
 
 ---
 
