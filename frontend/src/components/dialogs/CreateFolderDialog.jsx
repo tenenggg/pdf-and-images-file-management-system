@@ -3,7 +3,7 @@ import { Button } from '../common/Button';
 import { Modal } from '../common/Modal';
 import dialogStyles from './DialogForms.module.css';
 
-export function CreateFolderDialog({ open, onClose, onSubmit }) {
+export function CreateFolderDialog({ open, onClose, onSubmit, title = 'New folder' }) {
   const [name, setName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +26,7 @@ export function CreateFolderDialog({ open, onClose, onSubmit }) {
   return (
     <Modal
       open={open}
-      title="New folder"
+      title={title}
       onClose={onClose}
       footer={
         <>
@@ -43,7 +43,13 @@ export function CreateFolderDialog({ open, onClose, onSubmit }) {
         {error && <p className={dialogStyles.error}>{error}</p>}
         <label>
           Folder name
-          <input value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={title.toLowerCase().includes('root') ? 'e.g. My Files, Documents' : 'e.g. Project A'}
+            required
+            autoFocus
+          />
         </label>
       </form>
     </Modal>

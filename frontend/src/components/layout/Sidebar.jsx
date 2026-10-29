@@ -66,7 +66,16 @@ function SidebarNode({ node, currentFolderId, revealFolderIds, onNavigate, onOpe
   );
 }
 
-export function Sidebar({ currentFolderId, revealFolderIds, refreshKey, onNavigate, onOpenFile, onContextMenu }) {
+export function Sidebar({
+  currentFolderId,
+  revealFolderIds,
+  refreshKey,
+  onNavigate,
+  onOpenFile,
+  onContextMenu,
+  canCreateFolder,
+  onCreateFolder,
+}) {
   const [tree, setTree] = useState([]);
   const [error, setError] = useState(null);
 
@@ -99,6 +108,32 @@ export function Sidebar({ currentFolderId, revealFolderIds, refreshKey, onNaviga
           />
         ))}
       </ul>
+      {canCreateFolder && (
+        <div style={{ padding: '0.75rem', marginTop: '0.5rem', borderTop: '1px solid var(--color-border, #eee)' }}>
+          <button
+            type="button"
+            onClick={onCreateFolder}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              padding: '0.45rem 0.6rem',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              color: 'var(--color-primary, #e53e3e)',
+              background: 'transparent',
+              border: '1px dashed var(--color-border, #ccc)',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            <span>+</span>
+            <span>New Folder</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

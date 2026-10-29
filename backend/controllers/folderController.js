@@ -7,7 +7,7 @@ function mapPathSegment(folder) {
 
 export async function getTree(req, res, next) {
   try {
-    const tree = await folderModel.getNavTree();
+    const tree = await folderModel.getNavTree(req.user?.id);
     res.json({ tree });
   } catch (err) {
     next(err);
@@ -41,14 +41,21 @@ export async function createFolder(req, res, next) {
     if (!name?.trim()) {
       return res.status(400).json({ message: 'Folder name is required' });
     }
-    if (!Number.isInteger(Number(parentId)) || Number(parentId) <= 0) {
-      return res.status(400).json({ message: 'parentId is required' });
+
+    const resolvedParentId =
+      parentId !== undefined && parentId !== null && Number.isInteger(Number(parentId)) && Number(parentId) > 0
+        ? Number(parentId)
+        : null;
+
+    if (resolvedParentId === null && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only admins can create top-level root folders' });
     }
 
     const folder = await folderModel.createFolder({
       name: name.trim(),
-      parentId,
+      parentId: resolvedParentId,
       ownerId: req.user.id,
+      navKey: resolvedParentId === null && name.trim().toLowerCase() === 'my files' ? 'my-files' : null,
     });
 
     res.status(201).json({ folder });
@@ -64,11 +71,12 @@ export async function renameFolder(req, res, next) {
       return res.status(400).json({ message: 'Folder name is required' });
     }
 
-    const folder = await folderModel.renameFolder(req.params.id, name.trim());
-    if (!folder) {
+    const target = await folderModel.getFolderById(req.params.id);
+    if (!target) {
       return res.status(404).json({ message: 'Folder not found' });
     }
 
+    const folder = await folderModel.renameFolder(req.params.id, name.trim());
     res.json({ folder });
   } catch (err) {
     next(err);
@@ -77,6 +85,11 @@ export async function renameFolder(req, res, next) {
 
 export async function deleteFolder(req, res, next) {
   try {
+    const target = await folderModel.getFolderById(req.params.id);
+    if (!target) {
+      return res.status(404).json({ message: 'Folder not found' });
+    }
+
     const storageKeys = await folderModel.softDeleteFolder(req.params.id);
     // Delete all physical files from disk
     await Promise.all(storageKeys.map((key) => purgeFileStorage(key)));

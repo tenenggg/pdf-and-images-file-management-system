@@ -16,6 +16,7 @@ export function AppHeader({
   onSearchOptionsToggle,
   onBack,
   canGoBack,
+  onNavMyFiles,
 }) {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
@@ -52,7 +53,15 @@ export function AppHeader({
             &lt;
           </button>
           <nav className={styles.nav}>
-            <NavLink to="/drive" className={linkClass}>
+            <NavLink
+              to="/drive"
+              className={linkClass}
+              onClick={() => {
+                if (onNavMyFiles) {
+                  onNavMyFiles();
+                }
+              }}
+            >
               My Files
             </NavLink>
             {role === 'admin' && (

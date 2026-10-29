@@ -67,6 +67,67 @@ export async function listFolderContents(folderId) {
   return [...folders.map(mapFolder), ...files.map(mapFile)];
 }
 
+export async function ensureRootFolder(userId = null) {
+  // 1. Check if a root folder with nav_key = 'my-files' exists
+  const [existingMyFiles] = await pool.query(
+    "SELECT id, name, parent_id, nav_key FROM folders WHERE parent_id IS NULL AND nav_key = 'my-files' AND deleted_at IS NULL LIMIT 1"
+  );
+  if (existingMyFiles.length > 0) {
+    return existingMyFiles[0];
+  }
+
+  // 2. Check if any root folder named 'My Files' exists
+  const [existingByName] = await pool.query(
+    "SELECT id, name, parent_id, nav_key FROM folders WHERE parent_id IS NULL AND LOWER(name) = 'my files' AND deleted_at IS NULL LIMIT 1"
+  );
+  if (existingByName.length > 0) {
+    await pool.query("UPDATE folders SET nav_key = 'my-files' WHERE id = ?", [existingByName[0].id]);
+    existingByName[0].nav_key = 'my-files';
+    return existingByName[0];
+  }
+
+  // 3. Check if any root folder exists at all
+  const [anyRoot] = await pool.query(
+    "SELECT id, name, parent_id, nav_key FROM folders WHERE parent_id IS NULL AND deleted_at IS NULL LIMIT 1"
+  );
+  if (anyRoot.length > 0) {
+    if (!anyRoot[0].nav_key) {
+      await pool.query("UPDATE folders SET nav_key = 'my-files' WHERE id = ?", [anyRoot[0].id]);
+      anyRoot[0].nav_key = 'my-files';
+    }
+    return anyRoot[0];
+  }
+
+  // 4. Create root 'My Files' folder if none exists
+  let ownerId = userId;
+  if (!ownerId) {
+    const [adminUser] = await pool.query("SELECT id FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1");
+    ownerId = adminUser[0]?.id;
+  }
+  if (!ownerId) {
+    const [anyUser] = await pool.query("SELECT id FROM users ORDER BY id ASC LIMIT 1");
+    ownerId = anyUser[0]?.id;
+  }
+
+  if (!ownerId) {
+    return null;
+  }
+
+  const [insertRes] = await pool.query(
+    "INSERT INTO folders (name, parent_id, owner_id, nav_key) VALUES ('My Files', NULL, ?, 'my-files')",
+    [ownerId]
+  );
+  const rootId = insertRes.insertId;
+
+  // Create default subfolders under 'My Files'
+  await pool.query(
+    "INSERT INTO folders (name, parent_id, owner_id, nav_key) VALUES (?, ?, ?, ?), (?, ?, ?, ?)",
+    ['Documents', rootId, ownerId, 'documents', 'Images', rootId, ownerId, 'images']
+  );
+
+  return { id: rootId, name: 'My Files', parent_id: null, nav_key: 'my-files' };
+}
+
 export async function getNavTree() {
   const [rows] = await pool.query(
     `SELECT id, name, parent_id, nav_key FROM folders

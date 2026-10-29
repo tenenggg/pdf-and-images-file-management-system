@@ -51,7 +51,10 @@ export function FileManagerPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchAnchor, setSearchAnchor] = useState(null);
 
-  useEffect(() => {
+  const [rootFolderId, setRootFolderId] = useState(null);
+
+  const initTree = useCallback(() => {
+    setBootstrapError('');
     folderService
       .getFolderTree()
       .then((data) => {
@@ -59,14 +62,19 @@ export function FileManagerPage() {
           ?? data.tree?.find((node) => node.name?.trim().toLowerCase() === 'my files')
           ?? data.tree?.[0];
         if (myFiles?.folderId) {
+          setRootFolderId(myFiles.folderId);
           navigateToFolder(myFiles.folderId);
         } else {
-          setBootstrapError('Root folder not found. Run the database setup seed first.');
+          setRootFolderId(null);
         }
       })
       .catch((err) => setBootstrapError(err.message ?? 'Failed to load folders'))
       .finally(() => setBootstrapped(true));
   }, [navigateToFolder]);
+
+  useEffect(() => {
+    initTree();
+  }, [initTree]);
 
   useEffect(() => {
     const searchResult = location.state?.searchResult;
@@ -222,12 +230,12 @@ export function FileManagerPage() {
         id: 'new-folder',
         label: 'New Folder',
         onClick: () => {
-          setActionFolderId(destinationFolderId);
+          setActionFolderId(destinationFolderId || currentFolderId);
           setCreateOpen(true);
         },
       });
     }
-    if (permissions.canUpload) {
+    if (destinationFolderId && permissions.canUpload) {
       menuItems.push({
         id: 'upload',
         label: 'Upload File',
@@ -260,12 +268,16 @@ export function FileManagerPage() {
   );
 
   async function handleCreateFolder(name) {
-    const destinationFolderId = actionFolderId || currentFolderId;
-    if (!destinationFolderId) {
-      throw new Error('Open a folder before creating a folder');
-    }
-    await folderService.createFolder({ name, parentId: destinationFolderId });
+    const destinationFolderId = actionFolderId || currentFolderId || null;
+    const res = await folderService.createFolder({ name, parentId: destinationFolderId });
+    setTreeRefreshKey((k) => k + 1);
     await refreshAll();
+    if (res?.folder?.id) {
+      if (!currentFolderId) {
+        setRootFolderId(res.folder.id);
+        await navigateToFolder(res.folder.id);
+      }
+    }
   }
 
   function openCreateFolderDialog() {
@@ -334,7 +346,7 @@ export function FileManagerPage() {
     setSearchOpen((open) => !open);
   }
 
-  if (!bootstrapped && !currentFolderId) {
+  if (!bootstrapped && !currentFolderId && !rootFolderId) {
     return (
       <div className={layoutStyles.shell}>
         <AppHeader
@@ -342,13 +354,16 @@ export function FileManagerPage() {
           onViewModeChange={setViewMode}
           onBack={goBack}
           canGoBack={canGoBack}
+          onNavMyFiles={() => { if (rootFolderId) navigateToFolder(rootFolderId); }}
         />
-        <p style={{ padding: '1rem' }}>Loading file manager…</p>
+        <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted, #888)' }}>
+          Loading file manager…
+        </p>
       </div>
     );
   }
 
-  if (bootstrapError && !currentFolderId) {
+  if (bootstrapError && !currentFolderId && !rootFolderId) {
     return (
       <div className={layoutStyles.shell}>
         <AppHeader
@@ -356,8 +371,107 @@ export function FileManagerPage() {
           onViewModeChange={setViewMode}
           onBack={goBack}
           canGoBack={canGoBack}
+          onNavMyFiles={() => { if (rootFolderId) navigateToFolder(rootFolderId); }}
         />
-        <p style={{ padding: '1rem' }}>{bootstrapError}</p>
+        <div style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+          <p style={{ color: '#e53e3e', marginBottom: '1.25rem' }}>{bootstrapError}</p>
+          <button
+            type="button"
+            onClick={initTree}
+            style={{
+              padding: '0.55rem 1.4rem',
+              borderRadius: '6px',
+              backgroundColor: 'var(--color-primary, #e53e3e)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 500,
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (bootstrapped && !currentFolderId && !rootFolderId) {
+    return (
+      <div className={layoutStyles.shell}>
+        <AppHeader
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          onSearchSubmit={handleSearchSubmit}
+          onSearchFocus={() => setSearchOpen(true)}
+          onSearchOptionsToggle={toggleSearchOptions}
+          onBack={goBack}
+          canGoBack={canGoBack}
+          onNavMyFiles={() => { if (rootFolderId) navigateToFolder(rootFolderId); }}
+        />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem' }}>
+          <div
+            style={{
+              maxWidth: '480px',
+              width: '100%',
+              textAlign: 'center',
+              background: 'var(--color-bg-card, #fff)',
+              padding: '2.5rem',
+              borderRadius: '12px',
+              border: '1px solid var(--color-border, #eee)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
+            {permissions.canCreateFolder ? (
+              <>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text)' }}>
+                  No Folders Yet
+                </h2>
+                <p style={{ color: 'var(--color-text-muted, #666)', marginBottom: '1.75rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                  Welcome! As an administrator, you can create the first folder to begin organizing your files.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActionFolderId(null);
+                    setCreateOpen(true);
+                  }}
+                  style={{
+                    padding: '0.65rem 1.5rem',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--color-primary, #e53e3e)',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(229, 62, 62, 0.3)',
+                  }}
+                >
+                  + Create New Folder
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text)' }}>
+                  No Folders Available
+                </h2>
+                <p style={{ color: 'var(--color-text-muted, #666)', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                  No folders have been created yet. Please contact an administrator to create the initial root folder.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+
+        <CreateFolderDialog
+          open={createOpen}
+          title={!actionFolderId ? 'New root folder' : 'New folder'}
+          onClose={() => setCreateOpen(false)}
+          onSubmit={handleCreateFolder}
+        />
       </div>
     );
   }
@@ -374,6 +488,7 @@ export function FileManagerPage() {
         onSearchOptionsToggle={toggleSearchOptions}
         onBack={goBack}
         canGoBack={canGoBack}
+        onNavMyFiles={() => { if (rootFolderId) navigateToFolder(rootFolderId); }}
       />
       <div className={layoutStyles.body}>
         <Sidebar
@@ -381,6 +496,8 @@ export function FileManagerPage() {
           refreshKey={treeRefreshKey}
           onNavigate={navigateToFolder}
           onOpenFile={handleOpenFile}
+          canCreateFolder={permissions.canCreateFolder}
+          onCreateFolder={openCreateFolderDialog}
           onContextMenu={(event, item) => {
             if (item) {
               openItemContextMenu(
@@ -424,6 +541,7 @@ export function FileManagerPage() {
       />
       <CreateFolderDialog
         open={createOpen}
+        title="New folder"
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreateFolder}
       />
