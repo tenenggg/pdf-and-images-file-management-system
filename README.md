@@ -6,8 +6,6 @@ A full-stack file management platform built with React, Node.js, Express, and My
 
 ## 📸 Screenshots & UI Preview
 
-> *All application screenshots are located in [`docs/media/`](docs/media/). Below is the visual gallery showing both Admin and User perspectives across Light and Dark themes:*
-
 ### 1. Authentication & Onboarding
 | **Login Page** | **Account Registration** |
 |:---:|:---:|
