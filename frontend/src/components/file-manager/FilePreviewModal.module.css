@@ -1,0 +1,27 @@
+.viewer {
+  min-height: calc(100vh - 9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame,
+.image,
+.media {
+  width: 100%;
+  max-height: calc(100vh - 9rem);
+  border: 0;
+  object-fit: contain;
+}
+
+.frame {
+  height: calc(100vh - 9rem);
+}
+
+.audio {
+  width: min(80vw, 560px);
+}
+
+.unsupported {
+  color: var(--color-text-muted);
+}

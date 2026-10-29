@@ -1,0 +1,25 @@
+.group {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.group button {
+  border: none;
+  background: var(--color-bg-panel);
+  color: var(--color-text-muted);
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.group button.active {
+  background: var(--color-bg-selected);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.group button:hover:not(.active) {
+  background: var(--color-bg-hover);
+}

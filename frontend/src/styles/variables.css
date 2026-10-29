@@ -1,0 +1,37 @@
+:root,
+[data-theme='light'] {
+  --color-bg-app: #fffdf5;
+  --color-bg-panel: #ffffff;
+  --color-bg-sidebar: #fff8d9;
+  --color-bg-hover: #fff0b3;
+  --color-bg-selected: #ffe28a;
+  --color-border: #ead58a;
+  --color-text: #2d261b;
+  --color-text-muted: #786b52;
+  --color-accent: #d79a00;
+  --color-accent-hover: #b77d00;
+  --color-danger: #c7352f;
+  --color-success: #287a45;
+  --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --header-height: 72px;
+  --sidebar-width: 220px;
+  --details-width: 260px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 3px rgba(60, 64, 67, 0.15);
+}
+
+[data-theme='dark'] {
+  --color-bg-app: #1e1f22;
+  --color-bg-panel: #2b2d31;
+  --color-bg-sidebar: #232428;
+  --color-bg-hover: #35373c;
+  --color-bg-selected: #3c4a6b;
+  --color-border: #3f4147;
+  --color-text: #e8eaed;
+  --color-text-muted: #9aa0a6;
+  --color-accent: #8ab4f8;
+  --color-accent-hover: #aecbfa;
+  --color-danger: #f28b82;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+}

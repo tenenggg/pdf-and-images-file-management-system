@@ -1,0 +1,220 @@
+.header {
+  min-height: var(--header-height);
+  padding: 0.9rem 1.75rem;
+  background: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.topRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(16rem, 1fr) auto;
+  align-items: center;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.left {
+  gap: 0.8rem;
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between icon and text */
+  white-space: nowrap;
+}
+
+.brandIcon {
+  /* Match the visual height of your text */
+  height: 2rem; 
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.brandText {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 1.55rem;
+  color: var(--color-danger);
+}
+
+.backButton {
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-text);
+  color: var(--color-bg-panel);
+  font-size: 1.45rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.searchBox {
+  position: relative;
+  min-width: 12rem;
+  width: 100%;
+}
+
+.historyDropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: 100%;
+  background: var(--color-bg-app);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.historyItem {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.historyItem:hover,
+.historyItem:focus {
+  background: var(--color-bg-hover);
+  outline: none;
+}
+
+.historyIcon {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.search {
+  min-width: 12rem;
+  width: 100%;
+  max-width: none;
+  padding: 0.65rem 0.9rem;
+  padding-right: 3rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-app);
+  color: var(--color-text);
+}
+
+.searchOptions {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.searchOptions:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.nav {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.navLink {
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.navActive {
+  color: var(--color-text);
+  background: var(--color-bg-selected);
+  border: 1px solid var(--color-accent);
+  font-weight: 700;
+}
+
+.userBadge {
+  color: var(--color-danger);
+  font-size: 1.1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.logoutButton {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 0 0.75rem;
+  }
+
+  .topRow {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .left,
+  .right {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-size: 1rem;
+  }
+
+  .brandIcon {
+    height: 1.5rem;
+  }
+  
+  .brandText {
+    font-size: 1rem;
+  }
+
+  .search {
+    max-width: none;
+  }
+}
